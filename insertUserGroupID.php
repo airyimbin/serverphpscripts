@@ -16,47 +16,24 @@ $conn = mysqli_connect("projectlassodb.c6sx0lhoptoj.us-west-2.rds.amazonaws.com"
  $username = $_GET['username'];
   
   # Create a generic query that is for when all the fields are left blank.
-  $query = "select groupID from users where username = \"$username\"";
+  $query = "insert into groups (groupName) values ('$username Group'); select last_insert_id();";
   
   if ( ! ( $result = mysqli_query($conn, $query)) )      # Execute query
   { 
      printf("Error: %s\n", mysqli_error($conn));
      exit(1);
   } 
-  $row = mysqli_fetch_assoc($result);
-  $groupID = $row['groupID'];  
+$row = mysqli_fetch_assoc($result);
+$groupID = $row['last_insert_id()'];
   
-  if($groupID == null){
-	$noresponse = array();
-	$noresponse["users"] = array();
-	$noresponse["success"] = 0;
-	echo json_encode($noresponse);
-	exit(1);
-
-}	 
-  
- $query = "select * from users where groupID = $groupID";
+ $query = "update users set groupID=$groupID where username=$username;";
     
  if ( ! ( $result = mysqli_query($conn, $query)) )      # Execute query
  { 
     printf("Error: %s\n", mysqli_error($conn));
     exit(1);
  }
- $responce = array();
- $responce["users"] = array();
- while( $row = mysqli_fetch_assoc( $result )){
-	$temp = array();
-	$temp["name"] = $row["name"];
-	$temp["imageID"] = $row["imageID"];
-	$temp["email"] = $row["email"];
-	$temp["phonenumber"] = $row["phonenumber"];
-	$temp["username"] = $row["username"];
-	$temp["groupID"] = $row["groupID"];
 
-	array_push( $responce["users"], $temp);
- }
- $responce["success"] = 1;
- echo json_encode($responce);
 
   mysqli_free_result($result); #Close
     
